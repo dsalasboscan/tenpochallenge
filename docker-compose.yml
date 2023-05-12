@@ -1,0 +1,39 @@
+version: '3.1'
+
+services:
+  db:
+    container_name: postgres
+    image: postgres:12.13
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: Password01#
+    volumes:
+      - ./src/main/resources/db:/docker-entrypoint-initdb.d
+    ports:
+      - 5432:5432
+    networks:
+      - common_network
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    ports:
+      - 6379:6379
+    networks:
+      - common_network
+
+  application:
+    container_name: tenpo-challenge-application
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 9090:9090
+    depends_on:
+      - db
+      - redis
+    networks:
+      - common_network
+
+networks:
+  common_network:
